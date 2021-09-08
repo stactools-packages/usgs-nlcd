@@ -1,8 +1,8 @@
 import unittest
 
-import stactools.ephemeral
+import stactools.usgs_nlcd
 
 
 class TestModule(unittest.TestCase):
     def test_version(self):
-        self.assertIsNotNone(stactools.ephemeral.__version__)
+        self.assertIsNotNone(stactools.usgs_nlcd.__version__)
