@@ -1,6 +1,6 @@
 import unittest
 
-from stactools.ephemeral import stac
+from stactools.usgs_nlcd import stac
 
 
 class StacTest(unittest.TestCase):
