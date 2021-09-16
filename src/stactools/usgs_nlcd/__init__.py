@@ -1,5 +1,4 @@
 import stactools.core
-
 from stactools.usgs_nlcd.stac import create_collection, create_item
 
 __all__ = ['create_collection', 'create_item']
