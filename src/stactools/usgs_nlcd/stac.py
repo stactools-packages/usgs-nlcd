@@ -1,63 +1,48 @@
-from datetime import datetime
 import logging
 import os.path
+from datetime import datetime
+
+import fsspec
 import rasterio
-
+from pystac import (Asset, CatalogType, Collection, Extent, Item, MediaType,
+                    SpatialExtent, TemporalExtent)
+from pystac.extensions.file import FileExtension
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
+from pystac.extensions.label import (LabelClasses, LabelExtension, LabelTask,
+                                     LabelType)
 from pystac.extensions.projection import ProjectionExtension
-from pystac.extensions.label import (
-    LabelClasses,
-    LabelExtension,
-    LabelTask,
-    LabelType,
-)
-from pystac import (
-    Collection,
-    Item,
-    Asset,
-    Extent,
-    SpatialExtent,
-    TemporalExtent,
-    CatalogType,
-    MediaType,
-)
+from pystac.extensions.raster import (DataType, RasterBand, RasterExtension,
+                                      Sampling)
 
-from stactools.usgs_nlcd.constants import (
-    NLCD_ID,
-    SPATIAL_EXTENT,
-    TEMPORAL_EXTENT,
-    NLCD_PROVIDER,
-    TITLE,
-    DESCRIPTION,
-    LICENSE,
-    LICENSE_LINK,
-    NLCD_EPSG,
-    CLASSIFICATION_VALUES
-)
+from stactools.usgs_nlcd.constants import (CLASSIFICATION_VALUES, DESCRIPTION,
+                                           LICENSE, LICENSE_LINK, NLCD_EPSG,
+                                           NLCD_ID, NLCD_PROVIDER,
+                                           SPATIAL_EXTENT, SPATIAL_RES,
+                                           TEMPORAL_EXTENT, THUMBNAIL_HREF,
+                                           TITLE)
 
 logger = logging.getLogger(__name__)
 
-def create_item(source_href: str, cog_href: str) -> Item:
+
+def create_item(source_href: str,
+                cog_href: str,
+                thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     """Creates a STAC Item
     Args:
-        source_href: Path to the unaltered source img file.
+        source_href (str): Path to the unaltered source img file.
         cog_href (str): Path to COG asset.
         The COG should be created in advance using `cog.create_cog`
         destination (str): Directory where the Item will be stored.
     Returns:
         Item: STAC Item object
     """
-    
-    file_name = os.path.basename(source_href).split("_")[1]
-    
-    item_year = datetime.strptime(file_name, '%Y')
-    title = "USGS-NLCD-" + str(item_year)  + "-LANDCOVER"
 
-    properties = {
-        "title": title,
-        "description": DESCRIPTION
-    }
-    
+    file_name = os.path.basename(source_href).split("_")[1]
+    item_year = datetime.strptime(file_name, '%Y')
+    title = "USGS-NLCD-" + str(item_year) + "-LANDCOVER"
+
+    properties = {"title": title, "description": DESCRIPTION}
+
     geom = {
         "type":
         "Polygon",
@@ -79,7 +64,7 @@ def create_item(source_href: str, cog_href: str) -> Item:
             item_projection.bbox = list(dataset.bounds)
             item_projection.transform = list(dataset.transform)
             item_projection.shape = [dataset.height, dataset.width]
-    
+
     item_label = LabelExtension.ext(item, add_if_missing=True)
     item_label.label_type = LabelType.RASTER
     item_label.label_tasks = [LabelTask.CLASSIFICATION]
@@ -94,22 +79,68 @@ def create_item(source_href: str, cog_href: str) -> Item:
     ]
 
     # Add an asset to the item (COG for example)
+    cog_asset = Asset(
+        href=cog_href,
+        media_type=MediaType.COG,
+        roles=[
+            "data",
+            "labels",
+            "labels-raster",
+        ],
+        title="USGS Land cover COG",
+    )
+    item.add_asset("landcover", cog_asset)
+
     item.add_asset(
-        "cog",
+        "thumbnail",
         Asset(
-            href=cog_href,
-            media_type=MediaType.COG,
-            roles=["data"],
+            href=thumbnail_url,
+            media_type=MediaType.JPEG,
+            roles=["thumbnail"],
+            title="USGS Land Cover thumbnail",
         ),
     )
-    
+    # File Extension
+    cog_asset_file = FileExtension.ext(cog_asset, add_if_missing=True)
+    # The following odd type annotation is needed
+    mapping: List[Any] = [{
+        "values": [value],
+        "summary": summary
+    } for value, summary in CLASSIFICATION_VALUES.items()]
+    cog_asset_file.values = mapping
+    with fsspec.open(cog_href) as file:
+        size = file.size
+        if size is not None:
+            cog_asset_file.size = size
+    # Raster Extension
+    cog_asset_raster = RasterExtension.ext(cog_asset, add_if_missing=True)
+    cog_asset_raster.bands = [
+        RasterBand.create(nodata=0,
+                          sampling=Sampling.AREA,
+                          data_type=DataType.UINT8,
+                          spatial_resolution=SPATIAL_RES)
+    ]
+    # Projection Extension
+    cog_asset_projection = ProjectionExtension.ext(cog_asset,
+                                                   add_if_missing=True)
+    cog_asset_projection.epsg = item_projection.epsg
+    cog_asset_projection.bbox = item_projection.bbox
+    cog_asset_projection.transform = item_projection.transform
+    cog_asset_projection.shape = item_projection.shape
+    # Label Extension (doesn't seem to handle Assets properly)
+    cog_asset.extra_fields["label:type"] = item_label.label_type
+    cog_asset.extra_fields["label:tasks"] = item_label.label_tasks
+    cog_asset.extra_fields["label:properties"] = item_label.label_properties
+    cog_asset.extra_fields["label:description"] = item_label.label_description
+    cog_asset.extra_fields["label:classes"] = [
+        item_label.label_classes[0].to_dict()
+    ]
+
     return item
 
-def create_collection() -> Collection:
-    """Create a STAC Collection using a jsonld file provided by NRCan.
-    The metadata dict may be created using `utils.get_metadata`
-    Args:
-        thumbnail_url (str, optional): URL to a thumbnail image for the Collection
+
+def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
+    """Create a STAC Collection.
     Returns:
         pystac.Collection: pystac collection object
     """
@@ -128,20 +159,77 @@ def create_collection() -> Collection:
         catalog_type=CatalogType.RELATIVE_PUBLISHED,
     )
 
-    item_assets = ItemAssetsExtension.ext(collection, add_if_missing=True)
+    collection.add_asset(
+        "thumbnail",
+        pystac.Asset(
+            href=thumbnail_url,
+            media_type=pystac.MediaType.JPEG,
+            roles=["thumbnail"],
+            title="USGS Land Cover thumbnail",
+        ),
+    )
 
-    item_assets.item_assets = {
-        "cog":
+    collection_label = LabelExtension.summaries(collection,
+                                                add_if_missing=True)
+    collection_label.label_type = [LabelType.RASTER]
+    collection_label.label_tasks = [LabelTask.CLASSIFICATION]
+    collection_label.label_properties = None
+    collection_label.label_classes = [
+        # TODO: The STAC Label extension JSON Schema is incorrect.
+        # https://github.com/stac-extensions/label/pull/8
+        # https://github.com/stac-utils/pystac/issues/611
+        # When it is fixed, this should be None, not the empty string.
+        LabelClasses.create(list(CLASSIFICATION_VALUES.values()), "")
+    ]
+
+    collection_proj = ProjectionExtension.summaries(collection,
+                                                    add_if_missing=True)
+    collection_proj.epsg = [LANDCOVER_EPSG]
+
+    collection_item_assets = ItemAssetsExtension.ext(collection,
+                                                     add_if_missing=True)
+
+    collection_item_asset.item_assets = {
+        "thumbnail":
+        AssetDefinition(
+            dict(
+                type=pystac.MediaType.JPEG,
+                roles=["thumbnail"],
+                title="USGS Land Cover thumbnail",
+            )),
+        "landcover":
         AssetDefinition({
             "type":
-            MediaType.COG,
-            "roles": ["data"],
-            "description": "NLCD COG"
-        })
+            pystac.MediaType.COG,
+            "roles": [
+                "data",
+                "labels",
+                "labels-raster",
+            ],
+            "title":
+            "USGS Land Cover COG",
+            "raster:bands": [
+                RasterBand.create(nodata=0,
+                                  sampling=Sampling.AREA,
+                                  data_type=DataType.UINT8,
+                                  spatial_resolution=SPATIAL_RES).to_dict()
+            ],
+            "file:values": [{
+                "values": [value],
+                "summary": summary
+            } for value, summary in CLASSIFICATION_VALUES.items()],
+            "label:type":
+            collection_label.label_type[0],
+            "label:tasks":
+            collection_label.label_tasks,
+            "label:properties":
+            None,
+            "label:classes": [collection_label.label_classes[0].to_dict()],
+            "proj:epsg":
+            collection_proj.epsg[0]
+        }),
     }
 
     collection.add_link(LICENSE_LINK)
 
     return collection
-
-

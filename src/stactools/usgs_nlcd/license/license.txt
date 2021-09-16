@@ -1,1 +1,2 @@
- The goal of this project is to provide the Nation with complete, current, and consistent public domain information on its land use and land cover.
+The goal of this project is to provide the Nation with complete, current, and consistent public
+domain information on its land use and land cover.
