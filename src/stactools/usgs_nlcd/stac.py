@@ -1,25 +1,52 @@
 import logging
 import os.path
 from datetime import datetime
+from typing import Any, List
 
 import fsspec
 import rasterio
-from pystac import (Asset, CatalogType, Collection, Extent, Item, MediaType,
-                    SpatialExtent, TemporalExtent)
+from dateutil.relativedelta import relativedelta
+from pyproj import CRS, Proj
+from pystac import (
+    Asset,
+    CatalogType,
+    Collection,
+    Extent,
+    Item,
+    MediaType,
+    SpatialExtent,
+    TemporalExtent,
+)
 from pystac.extensions.file import FileExtension
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
-from pystac.extensions.label import (LabelClasses, LabelExtension, LabelTask,
-                                     LabelType)
+from pystac.extensions.label import (
+    LabelClasses,
+    LabelExtension,
+    LabelTask,
+    LabelType,
+)
 from pystac.extensions.projection import ProjectionExtension
-from pystac.extensions.raster import (DataType, RasterBand, RasterExtension,
-                                      Sampling)
+from pystac.extensions.raster import (
+    DataType,
+    RasterBand,
+    RasterExtension,
+    Sampling,
+)
 
-from stactools.usgs_nlcd.constants import (CLASSIFICATION_VALUES, DESCRIPTION,
-                                           LICENSE, LICENSE_LINK, NLCD_EPSG,
-                                           NLCD_ID, NLCD_PROVIDER,
-                                           SPATIAL_EXTENT, SPATIAL_RES,
-                                           TEMPORAL_EXTENT, THUMBNAIL_HREF,
-                                           TITLE)
+from stactools.usgs_nlcd.constants import (
+    CLASSIFICATION_VALUES,
+    DESCRIPTION,
+    LICENSE,
+    LICENSE_LINK,
+    NLCD_EPSG,
+    NLCD_ID,
+    NLCD_PROVIDER,
+    SPATIAL_EXTENT,
+    SPATIAL_RES,
+    TEMPORAL_EXTENT,
+    THUMBNAIL_HREF,
+    TITLE,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,34 +63,64 @@ def create_item(source_href: str,
     Returns:
         Item: STAC Item object
     """
+    # Get the corresponding year for the item id
+    file_year = os.path.basename(source_href).split("_")[1]
+    item_year = datetime.strptime(file_year, '%Y')
+    item_id = os.path.basename(cog_href).replace("_cog.tif", "")
 
-    file_name = os.path.basename(source_href).split("_")[1]
-    item_year = datetime.strptime(file_name, '%Y')
-    title = "USGS-NLCD-" + str(item_year) + "-LANDCOVER"
+    metadata_url = source_href.replace("img", "xml")
+
+    start_datetime = item_year
+    end_datetime = item_year + relativedelta(years=5)
+
+    if 'change' in source_href:
+        title = "USGS-NLCD-Change-Index"
+    else:
+        title = "USGS-NLCD-" + str(item_year.year)
 
     properties = {"title": title, "description": DESCRIPTION}
+    # Set the bounds
 
+    if cog_href is not None:
+        with rasterio.open(cog_href) as dataset:
+            cog_bbox = list(dataset.bounds)
+            cog_transform = list(dataset.transform)
+            cog_shape = [dataset.height, dataset.width]
+
+            transformer = Proj.from_crs(CRS.from_epsg(NLCD_EPSG),
+                                        CRS.from_epsg(4326),
+                                        always_xy=True)
+            bbox = list(
+                transformer.transform_bounds(dataset.bounds.left,
+                                             dataset.bounds.bottom,
+                                             dataset.bounds.right,
+                                             dataset.bounds.top))
     geom = {
         "type":
         "Polygon",
-        "coordinates": [[[-130.2, 21.7], [-63.7, 21.7], [-63.7, 49.1],
-                         [-130.2, 49.1], [-130.2, 21.7]]]
+        "coordinates": [[[bbox[0], bbox[1]], [bbox[2], bbox[1]],
+                         [bbox[2], bbox[3]], [bbox[0], bbox[3]],
+                         [bbox[0], bbox[1]]]]
     }
-
-    item = Item(id=f"{NLCD_ID}-{item_year}",
+    # Create the item
+    item = Item(id=f"{NLCD_ID}-{item_id}",
                 properties=properties,
                 geometry=geom,
-                bbox=SPATIAL_EXTENT,
+                bbox=bbox,
                 datetime=item_year,
                 stac_extensions=[])
 
+    if start_datetime and end_datetime:
+        item.common_metadata.start_datetime = start_datetime
+        item.common_metadata.end_datetime = end_datetime
+
+    # Projection Extension
     item_projection = ProjectionExtension.ext(item, add_if_missing=True)
     item_projection.epsg = NLCD_EPSG
-    if cog_href is not None:
-        with rasterio.open(cog_href) as dataset:
-            item_projection.bbox = list(dataset.bounds)
-            item_projection.transform = list(dataset.transform)
-            item_projection.shape = [dataset.height, dataset.width]
+
+    item_projection.bbox = cog_bbox
+    item_projection.transform = cog_transform
+    item_projection.shape = cog_shape
 
     item_label = LabelExtension.ext(item, add_if_missing=True)
     item_label.label_type = LabelType.RASTER
@@ -100,6 +157,16 @@ def create_item(source_href: str,
             title="USGS Land Cover thumbnail",
         ),
     )
+
+    item.add_asset(
+        "metadata",
+        Asset(
+            href=metadata_url,
+            media_type=MediaType.XML,
+            roles=["metadata"],
+            title="USGS-NLCD extended metadata",
+        ),
+    )
     # File Extension
     cog_asset_file = FileExtension.ext(cog_asset, add_if_missing=True)
     # The following odd type annotation is needed
@@ -127,14 +194,6 @@ def create_item(source_href: str,
     cog_asset_projection.bbox = item_projection.bbox
     cog_asset_projection.transform = item_projection.transform
     cog_asset_projection.shape = item_projection.shape
-    # Label Extension (doesn't seem to handle Assets properly)
-    cog_asset.extra_fields["label:type"] = item_label.label_type
-    cog_asset.extra_fields["label:tasks"] = item_label.label_tasks
-    cog_asset.extra_fields["label:properties"] = item_label.label_properties
-    cog_asset.extra_fields["label:description"] = item_label.label_description
-    cog_asset.extra_fields["label:classes"] = [
-        item_label.label_classes[0].to_dict()
-    ]
 
     return item
 
@@ -142,7 +201,7 @@ def create_item(source_href: str,
 def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
     """Create a STAC Collection.
     Returns:
-        pystac.Collection: pystac collection object
+        Collection: pystac collection object
     """
     extent = Extent(
         SpatialExtent([SPATIAL_EXTENT]),
@@ -161,9 +220,9 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
 
     collection.add_asset(
         "thumbnail",
-        pystac.Asset(
+        Asset(
             href=thumbnail_url,
-            media_type=pystac.MediaType.JPEG,
+            media_type=MediaType.JPEG,
             roles=["thumbnail"],
             title="USGS Land Cover thumbnail",
         ),
@@ -184,23 +243,23 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
 
     collection_proj = ProjectionExtension.summaries(collection,
                                                     add_if_missing=True)
-    collection_proj.epsg = [LANDCOVER_EPSG]
+    collection_proj.epsg = [NLCD_EPSG]
 
     collection_item_assets = ItemAssetsExtension.ext(collection,
                                                      add_if_missing=True)
 
-    collection_item_asset.item_assets = {
+    collection_item_assets.item_assets = {
         "thumbnail":
         AssetDefinition(
             dict(
-                type=pystac.MediaType.JPEG,
+                type=MediaType.JPEG,
                 roles=["thumbnail"],
                 title="USGS Land Cover thumbnail",
             )),
         "landcover":
         AssetDefinition({
             "type":
-            pystac.MediaType.COG,
+            MediaType.COG,
             "roles": [
                 "data",
                 "labels",
@@ -218,13 +277,6 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
                 "values": [value],
                 "summary": summary
             } for value, summary in CLASSIFICATION_VALUES.items()],
-            "label:type":
-            collection_label.label_type[0],
-            "label:tasks":
-            collection_label.label_tasks,
-            "label:properties":
-            None,
-            "label:classes": [collection_label.label_classes[0].to_dict()],
             "proj:epsg":
             collection_proj.epsg[0]
         }),

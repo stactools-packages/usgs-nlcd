@@ -29,7 +29,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             collection = pystac.read_file(destination)
-            self.assertEqual(collection.id, "my-collection-id")
+            self.assertEqual(collection.id, "USGS_NLCD")
             # self.assertEqual(item.other_attr...
 
             collection.validate()
@@ -43,7 +43,8 @@ class CommandsTest(CliTestCase):
             result = self.run_command([
                 "usgsnlcd",
                 "create-item",
-                "/path/to/asset.tif",
+                "tests/data-files/nlcd_2011_land_cover_l48_20210604.img",
+                "tests/data-files/nlcd_2011_land_cover_l48_20210604_07_02_cog.tif",
                 destination,
             ])
             self.assertEqual(result.exit_code,
@@ -54,7 +55,8 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "my-item-id")
+            self.assertEqual(
+                item.id, "USGS_NLCD-nlcd_2011_land_cover_l48_20210604_07_02")
             # self.assertEqual(item.other_attr...
 
             item.validate()
