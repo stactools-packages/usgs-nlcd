@@ -22,6 +22,17 @@ NLCD_PROVIDER = Provider(
     roles=[ProviderRole.PRODUCER, ProviderRole.PROCESSOR, ProviderRole.HOST],
     url="https://www.mrlc.gov/data/nlcd-land-cover-conus-all-years")
 
+DELTA_DICT = {
+    2001: datetime(2003, 12, 31),
+    2004: datetime(2005, 12, 31),
+    2006: datetime(2007, 12, 31),
+    2008: datetime(2010, 12, 31),
+    2011: datetime(2012, 12, 31),
+    2013: datetime(2015, 12, 31),
+    2016: datetime(2018, 12, 31),
+    2019: None
+}
+
 CLASSIFICATION_VALUES = {
     0: "no data",
     11: "Open Water",

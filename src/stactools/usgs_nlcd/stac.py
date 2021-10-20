@@ -6,7 +6,6 @@ from typing import Any, List
 
 import fsspec
 import rasterio
-from dateutil.relativedelta import relativedelta
 from pyproj import CRS, Proj
 from pystac import (
     Asset,
@@ -36,6 +35,7 @@ from pystac.extensions.raster import (
 
 from stactools.usgs_nlcd.constants import (
     CLASSIFICATION_VALUES,
+    DELTA_DICT,
     DESCRIPTION,
     LICENSE,
     LICENSE_LINK,
@@ -65,9 +65,6 @@ def create_item(cog_href: str, thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     file_year = os.path.basename(cog_href).split("_")[1]
     item_year = datetime.strptime(file_year, '%Y')
 
-    start_datetime = item_year
-    end_datetime = item_year + relativedelta(years=5)
-
     match = re.match(
         r"nlcd_(\d\d\d\d)_land_cover_l48_(\d*)_(\d\d)_(\d\d)\.tif",
         os.path.basename(cog_href))
@@ -80,7 +77,9 @@ def create_item(cog_href: str, thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     title = f"USGS-NLCD-{year_str}"
 
     properties = {"title": title, "description": DESCRIPTION}
-    # Set the bounds
+
+    start_datetime = item_year
+    end_datetime = DELTA_DICT[int(year_str)]
 
     if cog_href is not None:
         with rasterio.open(cog_href) as dataset:
