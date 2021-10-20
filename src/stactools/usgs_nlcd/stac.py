@@ -1,6 +1,7 @@
 import logging
 import os.path
 from datetime import datetime
+from typing import Any, List
 
 import fsspec
 import rasterio
