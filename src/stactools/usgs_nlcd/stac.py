@@ -162,9 +162,9 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
 
     collection.add_asset(
         "thumbnail",
-        pystac.Asset(
+        Asset(
             href=thumbnail_url,
-            media_type=pystac.MediaType.JPEG,
+            media_type=MediaType.JPEG,
             roles=["thumbnail"],
             title="USGS Land Cover thumbnail",
         ),
@@ -185,23 +185,23 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
 
     collection_proj = ProjectionExtension.summaries(collection,
                                                     add_if_missing=True)
-    collection_proj.epsg = [LANDCOVER_EPSG]
+    collection_proj.epsg = [NLCD_EPSG]
 
     collection_item_assets = ItemAssetsExtension.ext(collection,
                                                      add_if_missing=True)
 
-    collection_item_asset.item_assets = {
+    collection_item_assets.item_assets = {
         "thumbnail":
         AssetDefinition(
             dict(
-                type=pystac.MediaType.JPEG,
+                type=MediaType.JPEG,
                 roles=["thumbnail"],
                 title="USGS Land Cover thumbnail",
             )),
         "landcover":
         AssetDefinition({
             "type":
-            pystac.MediaType.COG,
+            MediaType.COG,
             "roles": [
                 "data",
                 "labels",
