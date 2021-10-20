@@ -38,18 +38,16 @@ def create_usgsnlcd_command(cli):
         return None
 
     @usgsnlcd.command("create-item", short_help="Create a STAC item")
-    @click.argument("source_href")
     @click.argument("cog_href")
     @click.argument("destination")
-    def create_item_command(source_href: str, cog_href: str, destination: str):
+    def create_item_command(cog_href: str, destination: str):
         """Creates a STAC Item
 
         Args:
-            source_href (str): Path to the unaltered source img file.
             cog_href (str): Path to the COG asset.
             destination (str): An HREF for the STAC Collection
         """
-        item = stac.create_item(source_href, cog_href)
+        item = stac.create_item(cog_href)
         item.validate()
 
         item.save_object(dest_href=destination)

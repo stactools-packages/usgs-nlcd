@@ -36,13 +36,10 @@ class StacTest(unittest.TestCase):
             cog_path = os.path.join(test_path, [
                 d for d in os.listdir(test_path) if d.lower().endswith(".tif")
             ][0])
-            source_path = os.path.join(test_path, [
-                d for d in os.listdir(test_path) if d.lower().endswith(".img")
-            ][0])
 
             # Create stac item
             json_path = os.path.join(tmp_dir, "test.json")
-            item = stac.create_item(source_path, cog_path)
+            item = stac.create_item(cog_path)
             item.set_self_href(json_path)
             item.save_object(dest_href=json_path)
 

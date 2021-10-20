@@ -3,6 +3,7 @@ import os.path
 from datetime import datetime
 from typing import Any, List
 
+import re
 import fsspec
 import rasterio
 from dateutil.relativedelta import relativedelta
@@ -51,12 +52,10 @@ from stactools.usgs_nlcd.constants import (
 logger = logging.getLogger(__name__)
 
 
-def create_item(source_href: str,
-                cog_href: str,
+def create_item(cog_href: str,
                 thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     """Creates a STAC Item
     Args:
-        source_href (str): Path to the unaltered source img file.
         cog_href (str): Path to COG asset.
         The COG should be created in advance using `cog.create_cog`
         destination (str): Directory where the Item will be stored.
@@ -64,25 +63,21 @@ def create_item(source_href: str,
         Item: STAC Item object
     """
     # Get the corresponding year for the item id
-    file_year = os.path.basename(source_href).split("_")[1]
+    file_year = os.path.basename(cog_href).split("_")[1]
     item_year = datetime.strptime(file_year, '%Y')
-    item_id = os.path.basename(cog_href).replace("_cog.tif", "")
-
-<<<<<<< HEAD
-    metadata_url = source_href.replace("img", "xml")
 
     start_datetime = item_year
     end_datetime = item_year + relativedelta(years=5)
 
-    if 'change' in source_href:
-        title = "USGS-NLCD-Change-Index"
-    else:
-        title = "USGS-NLCD-" + str(item_year.year)
-=======
-    file_name = os.path.basename(source_href).split("_")[1]
-    item_year = datetime.strptime(file_name, '%Y')
-    title = f"USGS-NLCD-{item_year}"
->>>>>>> 425b36a6da20c0c90058ab3bb6c79f1d3a8975b7
+    match = re.match(rf"nlcd_(\d\d\d\d)_land_cover_l48_(\d\d)_(\d\d)\.tif",
+                     os.path.basename(cog_href))
+    if match is None:
+        raise ValueError("Could not extract necessary values from {cog_href}")
+    year_str, pub_date, tile1, tile2 = match.groups()
+
+    metadata_url = f"nlcd_{year_str}_land_cover_l48_{pub_date}.xml"
+
+    title = f"USGS-NLCD-{year_str}"
 
     properties = {"title": title, "description": DESCRIPTION}
     # Set the bounds
@@ -109,7 +104,7 @@ def create_item(source_href: str,
                          [bbox[0], bbox[1]]]]
     }
     # Create the item
-    item = Item(id=f"{NLCD_ID}-{item_id}",
+    item = Item(id=f"{NLCD_ID}-{year_str}-{tile1}-{tile2}",
                 properties=properties,
                 geometry=geom,
                 bbox=bbox,
