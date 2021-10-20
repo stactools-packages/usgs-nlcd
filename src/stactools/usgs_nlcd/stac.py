@@ -68,6 +68,7 @@ def create_item(source_href: str,
     item_year = datetime.strptime(file_year, '%Y')
     item_id = os.path.basename(cog_href).replace("_cog.tif", "")
 
+<<<<<<< HEAD
     metadata_url = source_href.replace("img", "xml")
 
     start_datetime = item_year
@@ -77,6 +78,11 @@ def create_item(source_href: str,
         title = "USGS-NLCD-Change-Index"
     else:
         title = "USGS-NLCD-" + str(item_year.year)
+=======
+    file_name = os.path.basename(source_href).split("_")[1]
+    item_year = datetime.strptime(file_name, '%Y')
+    title = f"USGS-NLCD-{item_year}"
+>>>>>>> 425b36a6da20c0c90058ab3bb6c79f1d3a8975b7
 
     properties = {"title": title, "description": DESCRIPTION}
     # Set the bounds
