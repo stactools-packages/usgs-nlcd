@@ -1,9 +1,9 @@
 import logging
 import os.path
+import re
 from datetime import datetime
 from typing import Any, List
 
-import re
 import fsspec
 import rasterio
 from dateutil.relativedelta import relativedelta
@@ -52,8 +52,7 @@ from stactools.usgs_nlcd.constants import (
 logger = logging.getLogger(__name__)
 
 
-def create_item(cog_href: str,
-                thumbnail_url: str = THUMBNAIL_HREF) -> Item:
+def create_item(cog_href: str, thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     """Creates a STAC Item
     Args:
         cog_href (str): Path to COG asset.
@@ -69,8 +68,9 @@ def create_item(cog_href: str,
     start_datetime = item_year
     end_datetime = item_year + relativedelta(years=5)
 
-    match = re.match(rf"nlcd_(\d\d\d\d)_land_cover_l48_(\d\d)_(\d\d)\.tif",
-                     os.path.basename(cog_href))
+    match = re.match(
+        r"nlcd_(\d\d\d\d)_land_cover_l48_(\d*)_(\d\d)_(\d\d)\.tif",
+        os.path.basename(cog_href))
     if match is None:
         raise ValueError("Could not extract necessary values from {cog_href}")
     year_str, pub_date, tile1, tile2 = match.groups()

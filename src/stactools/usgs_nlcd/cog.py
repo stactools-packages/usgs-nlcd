@@ -55,9 +55,8 @@ def create_retiled_cogs(
                 file_names = glob(f"{tmp_dir}/*.tif")
                 for f in file_names:
                     input_file = os.path.join(tmp_dir, f)
-                    output_file = os.path.join(
-                        output_directory,
-                        os.path.basename(f).replace(".tif", "") + "_cog.tif")
+                    output_file = os.path.join(output_directory,
+                                               os.path.basename(f))
                     with rasterio.open(input_file, "r") as dataset:
                         contains_data = dataset.read().any()
                     if contains_data:
