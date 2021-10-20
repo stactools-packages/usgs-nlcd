@@ -40,7 +40,7 @@ def create_item(source_href: str,
 
     file_name = os.path.basename(source_href).split("_")[1]
     item_year = datetime.strptime(file_name, '%Y')
-    title = "USGS-NLCD-" + str(item_year) + "-LANDCOVER"
+    title = f"USGS-NLCD-{item_year}"
 
     properties = {"title": title, "description": DESCRIPTION}
 
