@@ -1,0 +1,293 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "USGS_NLCD-2019-05-09",
+  "properties": {
+    "title": "USGS-NLCD-2019",
+    "description": "The National Land Cover Database (NLCD) is an operational land cover monitoring program providing updated land cover and related information for the United States at five-year intervals.",
+    "proj:epsg": 6350,
+    "proj:bbox": [
+      -93045.0,
+      1810005.0,
+      206955.0,
+      2110005.0
+    ],
+    "proj:transform": [
+      30.0,
+      0.0,
+      -93045.0,
+      0.0,
+      -30.0,
+      2110005.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "proj:shape": [
+      10000,
+      10000
+    ],
+    "label:type": "raster",
+    "label:tasks": [
+      "classification"
+    ],
+    "label:properties": null,
+    "label:description": "",
+    "label:classes": [
+      {
+        "classes": [
+          "no data",
+          "Open Water",
+          "Perennial Ice/Snow",
+          "Developed, Open Space",
+          "Developed, Low Intensity",
+          "Developed, Medium Intensity",
+          "Developed, High Intensity",
+          "Barren Land(Rock/Sand/Clay)",
+          "Deciduous Forest",
+          "Evergreen Forest",
+          "Mixed Forest",
+          "Dwarf Scrub",
+          "Shrub/Scrub",
+          "GrassLand/Herbaceous",
+          "Sedge/Herbaceous",
+          "Lichens",
+          "Moss",
+          "Pasture/Hay",
+          "Cultivated Crops",
+          "Woody Wetlands",
+          "Emergent Herbaceous Wetlands"
+        ],
+        "name": ""
+      }
+    ],
+    "datetime": "2019-01-01T00:00:00Z"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -97.13083816952691,
+          39.28959539355274
+        ],
+        [
+          -93.48520578612022,
+          39.28959539355274
+        ],
+        [
+          -93.48520578612022,
+          41.99188510739696
+        ],
+        [
+          -97.13083816952691,
+          41.99188510739696
+        ],
+        [
+          -97.13083816952691,
+          39.28959539355274
+        ]
+      ]
+    ]
+  },
+  "links": [],
+  "assets": {
+    "landcover": {
+      "href": "tests/data-files/nlcd_2019_land_cover_l48_20210604_05_09.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "USGS Land cover COG",
+      "file:values": [
+        {
+          "values": [
+            0
+          ],
+          "summary": "no data"
+        },
+        {
+          "values": [
+            11
+          ],
+          "summary": "Open Water"
+        },
+        {
+          "values": [
+            12
+          ],
+          "summary": "Perennial Ice/Snow"
+        },
+        {
+          "values": [
+            21
+          ],
+          "summary": "Developed, Open Space"
+        },
+        {
+          "values": [
+            22
+          ],
+          "summary": "Developed, Low Intensity"
+        },
+        {
+          "values": [
+            23
+          ],
+          "summary": "Developed, Medium Intensity"
+        },
+        {
+          "values": [
+            24
+          ],
+          "summary": "Developed, High Intensity"
+        },
+        {
+          "values": [
+            31
+          ],
+          "summary": "Barren Land(Rock/Sand/Clay)"
+        },
+        {
+          "values": [
+            41
+          ],
+          "summary": "Deciduous Forest"
+        },
+        {
+          "values": [
+            42
+          ],
+          "summary": "Evergreen Forest"
+        },
+        {
+          "values": [
+            43
+          ],
+          "summary": "Mixed Forest"
+        },
+        {
+          "values": [
+            51
+          ],
+          "summary": "Dwarf Scrub"
+        },
+        {
+          "values": [
+            52
+          ],
+          "summary": "Shrub/Scrub"
+        },
+        {
+          "values": [
+            71
+          ],
+          "summary": "GrassLand/Herbaceous"
+        },
+        {
+          "values": [
+            72
+          ],
+          "summary": "Sedge/Herbaceous"
+        },
+        {
+          "values": [
+            73
+          ],
+          "summary": "Lichens"
+        },
+        {
+          "values": [
+            74
+          ],
+          "summary": "Moss"
+        },
+        {
+          "values": [
+            81
+          ],
+          "summary": "Pasture/Hay"
+        },
+        {
+          "values": [
+            82
+          ],
+          "summary": "Cultivated Crops"
+        },
+        {
+          "values": [
+            90
+          ],
+          "summary": "Woody Wetlands"
+        },
+        {
+          "values": [
+            95
+          ],
+          "summary": "Emergent Herbaceous Wetlands"
+        }
+      ],
+      "file:size": 20703519,
+      "raster:bands": [
+        {
+          "nodata": 0,
+          "sampling": "area",
+          "data_type": "uint8",
+          "spatial_resolution": 30
+        }
+      ],
+      "proj:epsg": 6350,
+      "proj:bbox": [
+        -93045.0,
+        1810005.0,
+        206955.0,
+        2110005.0
+      ],
+      "proj:transform": [
+        30.0,
+        0.0,
+        -93045.0,
+        0.0,
+        -30.0,
+        2110005.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:shape": [
+        10000,
+        10000
+      ],
+      "roles": [
+        "data",
+        "labels",
+        "labels-raster"
+      ]
+    },
+    "thumbnail": {
+      "href": "https://www.mrlc.gov/sites/default/files/2019-04/Land_cover_L48_6.png",
+      "type": "image/jpeg",
+      "title": "USGS Land Cover thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "metadata": {
+      "href": "nlcd_2019_land_cover_l48_20210604.xml",
+      "type": "application/xml",
+      "title": "USGS-NLCD extended metadata",
+      "roles": [
+        "metadata"
+      ]
+    }
+  },
+  "bbox": [
+    -97.13083816952691,
+    39.28959539355274,
+    -93.48520578612022,
+    41.99188510739696
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/label/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.0.0/schema.json"
+  ]
+}
