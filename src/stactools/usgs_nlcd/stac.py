@@ -212,7 +212,7 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
         "thumbnail",
         Asset(
             href=thumbnail_url,
-            media_type=MediaType.JPEG,
+            media_type=MediaType.PNG,
             roles=["thumbnail"],
             title="USGS Land Cover thumbnail",
         ),
