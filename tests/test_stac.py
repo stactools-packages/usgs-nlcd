@@ -32,7 +32,6 @@ class StacTest(unittest.TestCase):
             item = pystac.read_file(item_path)
         asset = item.assets["landcover"]
 
-        assert "thumbnail" in item.assets
         assert "data" in asset.roles
 
         # Projection Extension

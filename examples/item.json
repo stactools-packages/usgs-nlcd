@@ -261,14 +261,6 @@
         "labels-raster"
       ]
     },
-    "thumbnail": {
-      "href": "https://www.mrlc.gov/sites/default/files/2019-04/Land_cover_L48_6.png",
-      "type": "image/jpeg",
-      "title": "USGS Land Cover thumbnail",
-      "roles": [
-        "thumbnail"
-      ]
-    },
     "metadata": {
       "href": "nlcd_2019_land_cover_l48_20210604.xml",
       "type": "application/xml",

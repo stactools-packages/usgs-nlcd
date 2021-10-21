@@ -52,7 +52,7 @@ from stactools.usgs_nlcd.constants import (
 logger = logging.getLogger(__name__)
 
 
-def create_item(cog_href: str, thumbnail_url: str = THUMBNAIL_HREF) -> Item:
+def create_item(cog_href: str) -> Item:
     """Creates a STAC Item
     Args:
         cog_href (str): Path to COG asset.
@@ -149,16 +149,6 @@ def create_item(cog_href: str, thumbnail_url: str = THUMBNAIL_HREF) -> Item:
     item.add_asset("landcover", cog_asset)
 
     item.add_asset(
-        "thumbnail",
-        Asset(
-            href=thumbnail_url,
-            media_type=MediaType.JPEG,
-            roles=["thumbnail"],
-            title="USGS Land Cover thumbnail",
-        ),
-    )
-
-    item.add_asset(
         "metadata",
         Asset(
             href=metadata_url,
@@ -249,13 +239,6 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
                                                      add_if_missing=True)
 
     collection_item_assets.item_assets = {
-        "thumbnail":
-        AssetDefinition(
-            dict(
-                type=MediaType.JPEG,
-                roles=["thumbnail"],
-                title="USGS Land Cover thumbnail",
-            )),
         "landcover":
         AssetDefinition({
             "type":

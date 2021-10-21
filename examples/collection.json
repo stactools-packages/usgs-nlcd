@@ -31,13 +31,6 @@
     "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
   ],
   "item_assets": {
-    "thumbnail": {
-      "type": "image/jpeg",
-      "roles": [
-        "thumbnail"
-      ],
-      "title": "USGS Land Cover thumbnail"
-    },
     "landcover": {
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
       "roles": [
