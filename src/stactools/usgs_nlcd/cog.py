@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import rasterio
 
-from stactools.usgs_nlcd.constants import TILING_PIXEL_SIZE
+from stactools.usgs_nlcd.constants import NO_DATA, TILING_PIXEL_SIZE
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ def create_cog(
                 "-co",
                 "OVERVIEWS=IGNORE_EXISTING",
                 "-a_nodata",
-                "0",
+                str(NO_DATA),
                 input_path,
                 output_path,
             ]

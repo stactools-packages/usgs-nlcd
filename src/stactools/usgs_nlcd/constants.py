@@ -33,8 +33,9 @@ DELTA_DICT = {
     2019: None
 }
 
+NO_DATA = 0
 CLASSIFICATION_VALUES = {
-    0: "no data",
+    NO_DATA: "no data",
     11: "Open Water",
     12: "Perennial Ice/Snow",
     21: "Developed, Open Space",
