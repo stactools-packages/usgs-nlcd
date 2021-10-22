@@ -58,14 +58,18 @@ def create_usgsnlcd_command(cli):
         "create-cog",
         short_help="Transform Geotiff to Cloud-Optimized Geotiff.",
     )
-    @click.option("-d",
-                  "--destination",
-                  required=True,
-                  help="The output directory for the COG")
-    @click.option("-s",
-                  "--source",
-                  required=True,
-                  help="Path to an input GeoTiff")
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output directory for the COG",
+    )
+    @click.option(
+        "-s",
+        "--source",
+        required=True,
+        help="Path to an input GeoTiff",
+    )
     @click.option(
         "-t",
         "--tile",
