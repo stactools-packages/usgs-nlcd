@@ -58,7 +58,6 @@ def create_item(cog_href: str) -> Item:
     Args:
         cog_href (str): Path to COG asset.
         The COG should be created in advance using `cog.create_cog`
-        destination (str): Directory where the Item will be stored.
     Returns:
         Item: STAC Item object
     """
