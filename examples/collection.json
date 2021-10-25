@@ -1,0 +1,263 @@
+{
+  "type": "Collection",
+  "id": "USGS_NLCD",
+  "stac_version": "1.0.0",
+  "description": "The National Land Cover Database (NLCD) is an operational land cover monitoring program providing updated land cover and related information for the United States at five-year intervals.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "license",
+      "href": "https://www.usgs.gov/core-science-systems/hdds/data-policy",
+      "title": "Public Domain Waiver - USGS"
+    },
+    {
+      "rel": "self",
+      "href": "/Users/tomerrockman/scratch/usgs-nlcd/collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./USGS_NLCD-2019-05-09/USGS_NLCD-2019-05-09.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/label/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
+  ],
+  "item_assets": {
+    "landcover": {
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data",
+        "labels",
+        "labels-raster"
+      ],
+      "title": "USGS Land Cover COG",
+      "raster:bands": [
+        {
+          "nodata": 0,
+          "sampling": "area",
+          "data_type": "uint8",
+          "spatial_resolution": 30
+        }
+      ],
+      "file:values": [
+        {
+          "values": [
+            0
+          ],
+          "summary": "no data"
+        },
+        {
+          "values": [
+            11
+          ],
+          "summary": "Open Water"
+        },
+        {
+          "values": [
+            12
+          ],
+          "summary": "Perennial Ice/Snow"
+        },
+        {
+          "values": [
+            21
+          ],
+          "summary": "Developed, Open Space"
+        },
+        {
+          "values": [
+            22
+          ],
+          "summary": "Developed, Low Intensity"
+        },
+        {
+          "values": [
+            23
+          ],
+          "summary": "Developed, Medium Intensity"
+        },
+        {
+          "values": [
+            24
+          ],
+          "summary": "Developed, High Intensity"
+        },
+        {
+          "values": [
+            31
+          ],
+          "summary": "Barren Land(Rock/Sand/Clay)"
+        },
+        {
+          "values": [
+            41
+          ],
+          "summary": "Deciduous Forest"
+        },
+        {
+          "values": [
+            42
+          ],
+          "summary": "Evergreen Forest"
+        },
+        {
+          "values": [
+            43
+          ],
+          "summary": "Mixed Forest"
+        },
+        {
+          "values": [
+            51
+          ],
+          "summary": "Dwarf Scrub"
+        },
+        {
+          "values": [
+            52
+          ],
+          "summary": "Shrub/Scrub"
+        },
+        {
+          "values": [
+            71
+          ],
+          "summary": "GrassLand/Herbaceous"
+        },
+        {
+          "values": [
+            72
+          ],
+          "summary": "Sedge/Herbaceous"
+        },
+        {
+          "values": [
+            73
+          ],
+          "summary": "Lichens"
+        },
+        {
+          "values": [
+            74
+          ],
+          "summary": "Moss"
+        },
+        {
+          "values": [
+            81
+          ],
+          "summary": "Pasture/Hay"
+        },
+        {
+          "values": [
+            82
+          ],
+          "summary": "Cultivated Crops"
+        },
+        {
+          "values": [
+            90
+          ],
+          "summary": "Woody Wetlands"
+        },
+        {
+          "values": [
+            95
+          ],
+          "summary": "Emergent Herbaceous Wetlands"
+        }
+      ],
+      "proj:epsg": 6350
+    }
+  },
+  "title": "USGS NLCD (CONUS) All Years",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -130.2,
+          21.7,
+          -63.7,
+          49.1
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2001-01-01T00:00:00Z",
+          "2019-01-01T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "license": "proprietary",
+  "providers": [
+    {
+      "name": "United States Geological Survey",
+      "roles": [
+        "producer",
+        "processor",
+        "host"
+      ],
+      "url": "https://www.mrlc.gov/data/nlcd-land-cover-conus-all-years"
+    }
+  ],
+  "summaries": {
+    "label:type": [
+      "raster"
+    ],
+    "label:tasks": [
+      "classification"
+    ],
+    "label:classes": [
+      {
+        "classes": [
+          "no data",
+          "Open Water",
+          "Perennial Ice/Snow",
+          "Developed, Open Space",
+          "Developed, Low Intensity",
+          "Developed, Medium Intensity",
+          "Developed, High Intensity",
+          "Barren Land(Rock/Sand/Clay)",
+          "Deciduous Forest",
+          "Evergreen Forest",
+          "Mixed Forest",
+          "Dwarf Scrub",
+          "Shrub/Scrub",
+          "GrassLand/Herbaceous",
+          "Sedge/Herbaceous",
+          "Lichens",
+          "Moss",
+          "Pasture/Hay",
+          "Cultivated Crops",
+          "Woody Wetlands",
+          "Emergent Herbaceous Wetlands"
+        ],
+        "name": ""
+      }
+    ],
+    "proj:epsg": [
+      6350
+    ]
+  },
+  "assets": {
+    "thumbnail": {
+      "href": "https://www.mrlc.gov/sites/default/files/2019-04/Land_cover_L48_6.png",
+      "type": "image/png",
+      "title": "USGS Land Cover thumbnail",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

@@ -19,7 +19,7 @@ class CommandsTest(CliTestCase):
             destination = os.path.join(tmp_dir, "collection.json")
 
             result = self.run_command(
-                ["usgsnlcd", "create-collection", destination])
+                ["usgsnlcd", "create-collection", "-d", destination])
 
             self.assertEqual(result.exit_code,
                              0,
@@ -29,21 +29,21 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             collection = pystac.read_file(destination)
-            self.assertEqual(collection.id, "my-collection-id")
-            # self.assertEqual(item.other_attr...
+            self.assertEqual(collection.id, "USGS_NLCD")
 
             collection.validate()
 
     def test_create_item(self):
         with TemporaryDirectory() as tmp_dir:
-            # Run your custom create-item command and validate
 
             # Example:
             destination = os.path.join(tmp_dir, "collection.json")
             result = self.run_command([
                 "usgsnlcd",
                 "create-item",
-                "/path/to/asset.tif",
+                "-s",
+                "tests/data-files/nlcd_2019_land_cover_l48_20210604_05_09.tif",
+                "-d",
                 destination,
             ])
             self.assertEqual(result.exit_code,
@@ -54,7 +54,6 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "my-item-id")
-            # self.assertEqual(item.other_attr...
+            self.assertEqual(item.id, "USGS_NLCD-2019-05-09")
 
             item.validate()
