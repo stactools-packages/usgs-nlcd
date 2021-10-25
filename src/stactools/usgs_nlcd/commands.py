@@ -98,7 +98,7 @@ def create_usgsnlcd_command(cli):
         else:
             output_path = os.path.join(
                 destination,
-                os.path.basename(source)[:-4] + "_cog.tif")
+                os.path.basename(source)[:-4] + ".tif")
             cog.create_cog(source, output_path)
 
     return usgsnlcd

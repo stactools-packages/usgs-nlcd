@@ -31,7 +31,7 @@ DELTA_DICT = {
     2011: datetime(2012, 12, 31),
     2013: datetime(2015, 12, 31),
     2016: datetime(2018, 12, 31),
-    2019: None
+    2019: datetime(2021, 12, 31),
 }
 
 NO_DATA = 0

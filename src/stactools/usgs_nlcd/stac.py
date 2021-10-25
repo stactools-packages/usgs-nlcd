@@ -58,19 +58,24 @@ def create_item(cog_href: str) -> Item:
     Args:
         cog_href (str): Path to COG asset.
         The COG should be created in advance using `cog.create_cog`
+        destination (str): Directory where the Item will be stored.
     Returns:
         Item: STAC Item object
     """
-    # Get the corresponding year for the item id
-    file_year = os.path.basename(cog_href).split("_")[1]
-    item_year = datetime.strptime(file_year, '%Y')
-
     match = re.match(
         r"nlcd_(\d\d\d\d)_land_cover_l48_(\d*)_(\d\d)_(\d\d)\.tif",
         os.path.basename(cog_href))
-    if match is None:
-        raise ValueError("Could not extract necessary values from {cog_href}")
-    year_str, pub_date, tile1, tile2 = match.groups()
+    if match is not None:
+        year_str, pub_date, tile1, tile2 = match.groups()
+        id = f"{NLCD_ID}-{year_str}-{tile1}-{tile2}"
+    else:
+        match = re.match(r"nlcd_(\d\d\d\d)_land_cover_l48_(\d*)\.tif",
+                         os.path.basename(cog_href))
+        if match is None:
+            raise ValueError(
+                "Could not extract necessary values from {cog_href}")
+        year_str, pub_date = match.groups()
+        id = f"{NLCD_ID}-{year_str}"
 
     metadata_url = f"nlcd_{year_str}_land_cover_l48_{pub_date}.xml"
 
@@ -78,7 +83,7 @@ def create_item(cog_href: str) -> Item:
 
     properties = {"title": title, "description": DESCRIPTION}
 
-    start_datetime = item_year
+    start_datetime = datetime(int(year_str), 1, 1)
     end_datetime = DELTA_DICT[int(year_str)]
 
     if cog_href is not None:
@@ -103,16 +108,15 @@ def create_item(cog_href: str) -> Item:
                          [bbox[0], bbox[1]]]]
     }
     # Create the item
-    item = Item(id=f"{NLCD_ID}-{year_str}-{tile1}-{tile2}",
+    item = Item(id=id,
                 properties=properties,
                 geometry=geom,
                 bbox=bbox,
-                datetime=item_year,
+                datetime=start_datetime,
                 stac_extensions=[])
 
-    if start_datetime and end_datetime:
-        item.common_metadata.start_datetime = start_datetime
-        item.common_metadata.end_datetime = end_datetime
+    item.common_metadata.start_datetime = start_datetime
+    item.common_metadata.end_datetime = end_datetime
 
     # Projection Extension
     item_projection = ProjectionExtension.ext(item, add_if_missing=True)
