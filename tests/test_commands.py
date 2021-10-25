@@ -19,7 +19,7 @@ class CommandsTest(CliTestCase):
             destination = os.path.join(tmp_dir, "collection.json")
 
             result = self.run_command(
-                ["usgsnlcd", "create-collection", destination])
+                ["usgsnlcd", "create-collection", "-d", destination])
 
             self.assertEqual(result.exit_code,
                              0,
@@ -41,7 +41,9 @@ class CommandsTest(CliTestCase):
             result = self.run_command([
                 "usgsnlcd",
                 "create-item",
+                "-s",
                 "tests/data-files/nlcd_2019_land_cover_l48_20210604_05_09.tif",
+                "-d",
                 destination,
             ])
             self.assertEqual(result.exit_code,

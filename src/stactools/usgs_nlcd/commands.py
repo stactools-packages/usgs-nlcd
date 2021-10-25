@@ -21,7 +21,12 @@ def create_usgsnlcd_command(cli):
         "create-collection",
         short_help="Creates a STAC collection",
     )
-    @click.argument("destination")
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="Path to an output file for the collection",
+    )
     def create_collection_command(destination: str):
         """Creates a STAC Collection
 
@@ -38,16 +43,26 @@ def create_usgsnlcd_command(cli):
         return None
 
     @usgsnlcd.command("create-item", short_help="Create a STAC item")
-    @click.argument("cog_href")
-    @click.argument("destination")
-    def create_item_command(cog_href: str, destination: str):
+    @click.option(
+        "-d",
+        "--destination",
+        required=True,
+        help="The output file for the item",
+    )
+    @click.option(
+        "-s",
+        "--source",
+        required=True,
+        help="Path to an input COG",
+    )
+    def create_item_command(source: str, destination: str):
         """Creates a STAC Item
 
         Args:
-            cog_href (str): Path to the COG asset.
+            source (str): Path to the COG asset.
             destination (str): An HREF for the STAC Collection
         """
-        item = stac.create_item(cog_href)
+        item = stac.create_item(source)
         item.validate()
 
         item.save_object(dest_href=destination)
@@ -96,9 +111,8 @@ def create_usgsnlcd_command(cli):
         if tile:
             cog.create_retiled_cogs(source, destination)
         else:
-            output_path = os.path.join(
-                destination,
-                os.path.basename(source)[:-4] + ".tif")
+            output_path = os.path.join(destination,
+                                       os.path.basename(source)[:-4] + ".tif")
             cog.create_cog(source, output_path)
 
     return usgsnlcd
