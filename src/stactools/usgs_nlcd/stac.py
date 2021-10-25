@@ -39,6 +39,7 @@ from stactools.usgs_nlcd.constants import (
     DESCRIPTION,
     LICENSE,
     LICENSE_LINK,
+    NLCD_CRS_WKT,
     NLCD_EPSG,
     NLCD_ID,
     NLCD_PROVIDER,
@@ -117,6 +118,7 @@ def create_item(cog_href: str) -> Item:
     # Projection Extension
     item_projection = ProjectionExtension.ext(item, add_if_missing=True)
     item_projection.epsg = NLCD_EPSG
+    item_projection.wkt2 = NLCD_CRS_WKT
 
     item_projection.bbox = cog_bbox
     item_projection.transform = cog_transform
@@ -181,6 +183,7 @@ def create_item(cog_href: str) -> Item:
     cog_asset_projection = ProjectionExtension.ext(cog_asset,
                                                    add_if_missing=True)
     cog_asset_projection.epsg = item_projection.epsg
+    cog_asset_projection.wkt2 = item_projection.wkt2
     cog_asset_projection.bbox = item_projection.bbox
     cog_asset_projection.transform = item_projection.transform
     cog_asset_projection.shape = item_projection.shape

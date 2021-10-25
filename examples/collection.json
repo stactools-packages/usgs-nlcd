@@ -6,7 +6,7 @@
   "links": [
     {
       "rel": "root",
-      "href": "./new.json",
+      "href": "./collection.json",
       "type": "application/json"
     },
     {
@@ -16,7 +16,12 @@
     },
     {
       "rel": "self",
-      "href": "/Users/tomerrockman/scratch/usgs-nlcd/new.json",
+      "href": "/Users/tomerrockman/scratch/usgs-nlcd/collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./USGS_NLCD-2019-05-09/USGS_NLCD-2019-05-09.json",
       "type": "application/json"
     }
   ],

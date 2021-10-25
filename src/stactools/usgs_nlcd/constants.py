@@ -6,6 +6,7 @@ from pystac import Link, Provider, ProviderRole
 NLCD_ID = "USGS_NLCD"
 NLCD_EPSG = 6350
 NLCD_CRS = CRS.from_epsg(NLCD_EPSG)
+NLCD_CRS_WKT = CRS.from_epsg(NLCD_EPSG).to_wkt()
 LICENSE = "proprietary"
 lic_link = "https://www.usgs.gov/core-science-systems/hdds/data-policy"
 LICENSE_LINK = Link(rel="license",
