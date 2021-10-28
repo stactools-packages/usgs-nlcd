@@ -29,7 +29,7 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             collection = pystac.read_file(destination)
-            self.assertEqual(collection.id, "USGS_NLCD")
+            self.assertEqual(collection.id, "usgs-nlcd")
 
             collection.validate()
 
@@ -54,6 +54,6 @@ class CommandsTest(CliTestCase):
             self.assertEqual(len(jsons), 1)
 
             item = pystac.read_file(destination)
-            self.assertEqual(item.id, "USGS_NLCD-2019-05-09")
+            self.assertEqual(item.id, "usgs-nlcd-2019-05-09")
 
             item.validate()
