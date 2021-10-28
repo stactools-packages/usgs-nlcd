@@ -23,6 +23,18 @@ NLCD_PROVIDER = Provider(
     roles=[ProviderRole.PRODUCER, ProviderRole.PROCESSOR, ProviderRole.HOST],
     url="https://www.mrlc.gov/data/nlcd-land-cover-conus-all-years")
 
+KEYWORDS = [
+    "CONUS",
+    "Geographical maps",
+    "Land Cover",
+    "North America",
+    "Northern Hemisphere",
+    "Remote Sensing",
+    "United States of America",
+    "USGS",
+    "Western Hemisphere",
+]
+
 DELTA_DICT = {
     2001: datetime(2003, 12, 31),
     2004: datetime(2005, 12, 31),

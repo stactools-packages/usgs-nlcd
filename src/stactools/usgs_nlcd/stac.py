@@ -38,6 +38,7 @@ from stactools.usgs_nlcd.constants import (
     CLASSIFICATION_VALUES,
     DELTA_DICT,
     DESCRIPTION,
+    KEYWORDS,
     LICENSE,
     LICENSE_LINK,
     NLCD_CRS_WKT,
@@ -220,6 +221,7 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
         providers=[NLCD_PROVIDER],
         extent=extent,
         catalog_type=CatalogType.RELATIVE_PUBLISHED,
+        keywords=KEYWORDS,
     )
 
     collection.add_asset(
