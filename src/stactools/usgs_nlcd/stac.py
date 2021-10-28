@@ -2,7 +2,7 @@ import logging
 import os.path
 import re
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Optional
 
 import fsspec
 import rasterio
@@ -32,6 +32,7 @@ from pystac.extensions.raster import (
     RasterExtension,
     Sampling,
 )
+from stactools.core.io import ReadHrefModifier
 
 from stactools.usgs_nlcd.constants import (
     CLASSIFICATION_VALUES,
@@ -53,15 +54,23 @@ from stactools.usgs_nlcd.constants import (
 logger = logging.getLogger(__name__)
 
 
-def create_item(cog_href: str) -> Item:
+def create_item(
+    cog_href: str,
+    cog_href_modifier: Optional[ReadHrefModifier] = None,
+) -> Item:
     """Creates a STAC Item
     Args:
         cog_href (str): Path to COG asset.
-        The COG should be created in advance using `cog.create_cog`
-        destination (str): Directory where the Item will be stored.
+            The COG should be created in advance using `cog.create_cog`
+        cog_href_modifier (ReadHrefModifier, optional): Modifier for access to cog_href
     Returns:
         Item: STAC Item object
     """
+    if cog_href_modifier is not None:
+        cog_access_href = cog_href_modifier(cog_href)
+    else:
+        cog_access_href = cog_href
+
     match = re.match(
         r"nlcd_(\d\d\d\d)_land_cover_l48_(\d*)_(\d\d)_(\d\d)\.tif",
         os.path.basename(cog_href))
@@ -86,20 +95,19 @@ def create_item(cog_href: str) -> Item:
     start_datetime = datetime(int(year_str), 1, 1)
     end_datetime = DELTA_DICT[int(year_str)]
 
-    if cog_href is not None:
-        with rasterio.open(cog_href) as dataset:
-            cog_bbox = list(dataset.bounds)
-            cog_transform = list(dataset.transform)
-            cog_shape = [dataset.height, dataset.width]
+    with rasterio.open(cog_access_href) as dataset:
+        cog_bbox = list(dataset.bounds)
+        cog_transform = list(dataset.transform)
+        cog_shape = [dataset.height, dataset.width]
 
-            transformer = Proj.from_crs(CRS.from_epsg(NLCD_EPSG),
-                                        CRS.from_epsg(4326),
-                                        always_xy=True)
-            bbox = list(
-                transformer.transform_bounds(dataset.bounds.left,
-                                             dataset.bounds.bottom,
-                                             dataset.bounds.right,
-                                             dataset.bounds.top))
+        transformer = Proj.from_crs(CRS.from_epsg(NLCD_EPSG),
+                                    CRS.from_epsg(4326),
+                                    always_xy=True)
+        bbox = list(
+            transformer.transform_bounds(dataset.bounds.left,
+                                         dataset.bounds.bottom,
+                                         dataset.bounds.right,
+                                         dataset.bounds.top))
     geom = {
         "type":
         "Polygon",
@@ -170,7 +178,7 @@ def create_item(cog_href: str) -> Item:
         "summary": summary
     } for value, summary in CLASSIFICATION_VALUES.items()]
     cog_asset_file.values = mapping
-    with fsspec.open(cog_href) as file:
+    with fsspec.open(cog_access_href) as file:
         size = file.size
         if size is not None:
             cog_asset_file.size = size
