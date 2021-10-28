@@ -161,7 +161,7 @@ def create_item(
             "labels",
             "labels-raster",
         ],
-        title="USGS Land cover COG",
+        title="USGS Land Cover COG",
     )
     item.add_asset("landcover", cog_asset)
 
