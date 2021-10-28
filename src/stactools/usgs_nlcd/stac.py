@@ -87,7 +87,10 @@ def create_item(
         year_str, pub_date = match.groups()
         id = f"{NLCD_ID}-{year_str}"
 
-    metadata_url = f"nlcd_{year_str}_land_cover_l48_{pub_date}.xml"
+    metadata_url = os.path.join(
+        os.path.dirname(cog_href),
+        f"nlcd_{year_str}_land_cover_l48_{pub_date}.xml",
+    )
 
     title = f"USGS-NLCD-{year_str}"
 
@@ -168,7 +171,7 @@ def create_item(
             href=metadata_url,
             media_type=MediaType.XML,
             roles=["metadata"],
-            title="USGS-NLCD extended metadata",
+            title="USGS NLCD extended metadata",
         ),
     )
     # File Extension
@@ -278,6 +281,12 @@ def create_collection(thumbnail_url: str = THUMBNAIL_HREF) -> Collection:
             } for value, summary in CLASSIFICATION_VALUES.items()],
             "proj:epsg":
             collection_proj.epsg[0]
+        }),
+        "metadata":
+        AssetDefinition({
+            "type": MediaType.XML,
+            "roles": ["metadata"],
+            "title": "USGS NLCD extended metadata",
         }),
     }
 
